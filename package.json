@@ -1,0 +1,16 @@
+{
+  "name": "roguelike",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "webpack -w --mode=development",
+    "build": "webpack --mode=production"
+  },
+  "dependencies": {
+    "ts-loader": "^8.0.1",
+    "typescript": "^3.9.7",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.12"
+  }
+}
