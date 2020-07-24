@@ -1,4 +1,5 @@
-import {Astar, Graph, GridNode} from "./astar";
+import {Grid} from './Grid'
+import {PathFinding} from './PathFinding'
 
 const $canvas = document.createElement('canvas')
 const ctx = $canvas.getContext('2d') as CanvasRenderingContext2D
@@ -6,43 +7,30 @@ const ctx = $canvas.getContext('2d') as CanvasRenderingContext2D
 const width = $canvas.width = 512
 const height = $canvas.height = 288
 
+const TILE_SIZE = 16
+const COL_COUNT = width / TILE_SIZE
+const ROW_COUNT = height / TILE_SIZE
+
 const Main = (() => {
     document.body.appendChild($canvas)
 
-    const tileSize = 20
-    const grid = [
-        [1, 1, 1, 1],
-        [0, 1, 1, 0],
-        [0, 0, 1, 1]
-    ]
-    for (let [rowIndex, row] of grid.entries()) {
-        for (let [colIndex, col] of row.entries()) {
-            ctx.save()
-            ctx.translate(colIndex * tileSize, rowIndex * tileSize)
-            if (col === 1) {
-                ctx.fillStyle = 'gray'
-            }
-            ctx.fillRect(0, 0, tileSize, tileSize)
-            ctx.restore()
-        }
-    }
+    const grid = new Grid(ROW_COUNT, COL_COUNT, TILE_SIZE)
+    grid.tiles.forEach(t => t.render(ctx))
 
-    const graph = new Graph(grid, false)
-    const start = graph.grid[0][0];
-    const end = graph.grid[2][3];
+    const start = grid.tiles[0]
+    const end = grid.tiles[grid.tiles.length - 1]
 
-    const path = Astar.search(graph, start, end, {})
-    ctx.save()
-    ctx.translate(start.x * tileSize, start.y * tileSize)
-    ctx.fillStyle = 'green'
-    ctx.fillRect(0, 0, tileSize, tileSize)
-    ctx.restore()
-    for (let step of path) {
-        ctx.save()
-        ctx.translate(step.x * tileSize, step.y * tileSize)
-        ctx.fillStyle = 'red'
-        ctx.fillRect(0, 0, tileSize, tileSize)
-        ctx.restore()
-    }
+    start.color = 'green'
+    start.render(ctx)
 
+    const pathFinding = new PathFinding(grid)
+    const path = pathFinding.getPath(start, end)
+
+    path.forEach(t => {
+        t.color = 'blue'
+        t.render(ctx)
+    })
+
+    end.color = 'red'
+    end.render(ctx)
 })()
