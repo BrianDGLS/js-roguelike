@@ -1,8 +1,17 @@
 export class Tile {
     public color: string = 'gray'
 
+    public visited: boolean = false
+    public accessible: boolean = true
+
+    public path: Tile[] = []
+
+    static getIDFromCoordinates(x: number, y: number) {
+        return `${x}/${y}`
+    }
+
     get id(): string {
-        return `${this.colIndex}/${this.rowIndex}`
+        return Tile.getIDFromCoordinates(this.colIndex, this.rowIndex)
     }
 
     get x(): number {

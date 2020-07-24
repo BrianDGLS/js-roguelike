@@ -15,13 +15,16 @@ const Main = (() => {
     document.body.appendChild($canvas)
 
     const grid = new Grid(ROW_COUNT, COL_COUNT, TILE_SIZE)
+    grid.tiles.forEach(t => {
+        if(Math.random() < .2) {
+            t.accessible = false
+            t.color = 'black'
+        }
+    })
     grid.tiles.forEach(t => t.render(ctx))
 
     const start = grid.tiles[0]
-    const end = grid.tiles[grid.tiles.length - 1]
-
-    start.color = 'green'
-    start.render(ctx)
+    const end = grid.tiles[78]
 
     const pathFinding = new PathFinding(grid)
     const path = pathFinding.getPath(start, end)
@@ -30,6 +33,9 @@ const Main = (() => {
         t.color = 'blue'
         t.render(ctx)
     })
+
+    start.color = 'green'
+    start.render(ctx)
 
     end.color = 'red'
     end.render(ctx)
