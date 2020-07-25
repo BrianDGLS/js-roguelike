@@ -15,16 +15,16 @@ const Main = (() => {
     document.body.appendChild($canvas)
 
     const grid = new Grid(ROW_COUNT, COL_COUNT, TILE_SIZE)
-    grid.tiles.forEach(t => {
-        if(Math.random() < .2) {
+    const start = grid.tiles[0]
+    const end = grid.tiles[grid.tiles.length - 1]
+
+    grid.tiles.filter(t => t.id !== end.id && t.id !== start.id).forEach(t => {
+        if (Math.random() < .2) {
             t.accessible = false
-            t.color = 'black'
         }
     })
     grid.tiles.forEach(t => t.render(ctx))
 
-    const start = grid.tiles[0]
-    const end = grid.tiles[78]
 
     const pathFinding = new PathFinding(grid)
     const path = pathFinding.getPath(start, end)

@@ -1,7 +1,6 @@
 export class Tile {
     public color: string = 'gray'
 
-    public visited: boolean = false
     public accessible: boolean = true
 
     public path: Tile[] = []
@@ -28,7 +27,7 @@ export class Tile {
     render(ctx: CanvasRenderingContext2D) {
         ctx.save()
         ctx.translate(this.x, this.y)
-        ctx.fillStyle = this.color
+        ctx.fillStyle = this.accessible ? this.color : 'black'
         ctx.fillRect(0, 0, this.size, this.size)
         ctx.restore()
     }

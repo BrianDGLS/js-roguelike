@@ -5,6 +5,8 @@ enum Direction { North, South, East, West}
 
 
 export class PathFinding {
+    private _checked: { [key: string]: boolean } = {}
+
     constructor(public grid: Grid) {
     }
 
@@ -12,57 +14,31 @@ export class PathFinding {
         if (start.id === end.id) return []
         if (!this.tileInGrid(start) || !this.tileInGrid(end)) return []
 
-        const queue = [start]
+        this._checked = {}
 
+        const checkAbove = this.exploreInDirection.bind(this, Direction.North)
+        const checkBelow = this.exploreInDirection.bind(this, Direction.South)
+        const checkToLeft = this.exploreInDirection.bind(this, Direction.West)
+        const checkToRight = this.exploreInDirection.bind(this, Direction.East)
+        const checks = [checkAbove, checkBelow, checkToLeft, checkToRight]
+
+        const queue = [start]
         while (queue.length) {
             const current = queue.shift() as Tile
 
-            // Check tile above
-            const tileAbove = this.exploreInDirection(current, Direction.North)
-            if (tileAbove && !tileAbove.visited) {
-                if (tileAbove.id === end.id) {
-                    return tileAbove.path
-                } else if (tileAbove.accessible) {
-                    queue.push(tileAbove)
-                }
-            }
+            for (const check of checks) {
+                const target = check(current)
+                if (!target) continue
 
-            // Check tile below
-            const tileBelow = this.exploreInDirection(current, Direction.South)
-            if (tileBelow && !tileBelow.visited) {
-                if (tileBelow.id === end.id) {
-                    return tileBelow.path
-                } else if (tileBelow.accessible) {
-                    queue.push(tileBelow)
-                }
+                if (target.id === end.id) return target.path
+                if (target.accessible) queue.push(target)
             }
-
-            // Check tile to left
-            const tileToLeft = this.exploreInDirection(current, Direction.West)
-            if (tileToLeft && !tileToLeft.visited) {
-                if (tileToLeft.id === end.id) {
-                    return tileToLeft.path
-                } else if (tileToLeft.accessible) {
-                    queue.push(tileToLeft)
-                }
-            }
-
-            // Check tile to right
-            const tileToRight = this.exploreInDirection(current, Direction.East)
-            if (tileToRight && !tileToRight.visited) {
-                if (tileToRight.id === end.id) {
-                    return tileToRight.path
-                } else if (tileToRight.accessible) {
-                    queue.push(tileToRight)
-                }
-            }
-
         }
 
         return []
     }
 
-    private exploreInDirection(tile: Tile, direction: Direction) {
+    private exploreInDirection(direction: Direction, tile: Tile) {
         let {rowIndex, colIndex} = tile
         if (direction === Direction.North) {
             rowIndex -= 1
@@ -74,14 +50,15 @@ export class PathFinding {
             colIndex -= 1
         }
 
-        tile.visited = true
-
         const targetID = Tile.getIDFromCoordinates(colIndex, rowIndex)
+
+        if (this._checked[targetID]) return
+        else this._checked[targetID] = true
+
         const target = this.grid.tiles.find(t => t.id === targetID)
         if (!target || !target.accessible) return
 
         target.path = [tile, ...tile.path]
-
         return target
     }
 
