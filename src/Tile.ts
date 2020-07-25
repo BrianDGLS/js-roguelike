@@ -1,4 +1,6 @@
-export enum TileTypes {Wall, Floor, Empty}
+import {drawSprite} from './spriteSheet'
+
+export enum TileTypes { Floor, Wall, Empty, Path}
 
 export class Tile {
     color: string = 'gray'
@@ -31,8 +33,22 @@ export class Tile {
     render(ctx: CanvasRenderingContext2D) {
         ctx.save()
         ctx.translate(this.x, this.y)
-        ctx.fillStyle = this.accessible ? this.color : 'black'
-        ctx.fillRect(0, 0, this.size, this.size)
+
+        const drawOptions = {ctx, scale: 1, frameX: 0, frameY: 0, canvasX: 0, canvasY: 0}
+        switch (this.type) {
+            case TileTypes.Floor:
+                drawSprite(drawOptions)
+                break
+            case TileTypes.Wall:
+                drawSprite({...drawOptions, frameX: 1})
+                break
+            case TileTypes.Path:
+                drawSprite({...drawOptions, frameX: 2})
+                break
+            case TileTypes.Empty:
+            default:
+        }
+
         ctx.restore()
     }
 }

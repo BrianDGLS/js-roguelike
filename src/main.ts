@@ -1,6 +1,7 @@
 import {Grid} from './Grid'
 import {PathFinding} from './PathFinding'
 import {TileTypes} from './Tile'
+import {spriteSheet} from './spriteSheet'
 
 const $canvas = document.createElement('canvas')
 const ctx = $canvas.getContext('2d') as CanvasRenderingContext2D
@@ -8,7 +9,7 @@ const ctx = $canvas.getContext('2d') as CanvasRenderingContext2D
 const width = $canvas.width = 512
 const height = $canvas.height = 288
 
-const TILE_SIZE = 16
+const TILE_SIZE = 8
 const COL_COUNT = width / TILE_SIZE
 const ROW_COUNT = height / TILE_SIZE
 
@@ -21,7 +22,7 @@ const Main = (() => {
 
     grid.tiles.filter(t => t.id !== end.id && t.id !== start.id).forEach(t => {
         if (Math.random() < .2) {
-            t.type = TileTypes.Empty
+            t.type = TileTypes.Wall
         }
     })
     grid.tiles.forEach(t => t.render(ctx))
@@ -29,15 +30,9 @@ const Main = (() => {
 
     const pathFinding = new PathFinding(grid)
     const path = pathFinding.getPath(start, end)
+    path.map(t => t.type = TileTypes.Path)
 
-    path.forEach(t => {
-        t.color = 'blue'
-        t.render(ctx)
-    })
-
-    start.color = 'green'
-    start.render(ctx)
-
-    end.color = 'red'
-    end.render(ctx)
+    spriteSheet.onload = () => {
+        grid.tiles.forEach(t => t.render(ctx))
+    }
 })()
