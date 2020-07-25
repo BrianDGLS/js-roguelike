@@ -1,12 +1,12 @@
+export enum TileTypes {Wall, Floor, Empty}
+
 export class Tile {
-    public color: string = 'gray'
+    color: string = 'gray'
 
-    public accessible: boolean = true
+    type: TileTypes = TileTypes.Floor
 
-    public path: Tile[] = []
-
-    static getIDFromCoordinates(x: number, y: number) {
-        return `${x}/${y}`
+    get accessible(): boolean {
+        return this.type === TileTypes.Floor
     }
 
     get id(): string {
@@ -19,6 +19,10 @@ export class Tile {
 
     get y(): number {
         return this.rowIndex * this.size
+    }
+
+    static getIDFromCoordinates(x: number, y: number) {
+        return `${x}/${y}`
     }
 
     constructor(public colIndex: number, public rowIndex: number, public size: number) {

@@ -1,5 +1,6 @@
 import {Grid} from './Grid'
 import {PathFinding} from './PathFinding'
+import {TileTypes} from './Tile'
 
 const $canvas = document.createElement('canvas')
 const ctx = $canvas.getContext('2d') as CanvasRenderingContext2D
@@ -20,7 +21,7 @@ const Main = (() => {
 
     grid.tiles.filter(t => t.id !== end.id && t.id !== start.id).forEach(t => {
         if (Math.random() < .2) {
-            t.accessible = false
+            t.type = TileTypes.Empty
         }
     })
     grid.tiles.forEach(t => t.render(ctx))

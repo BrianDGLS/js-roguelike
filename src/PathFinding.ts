@@ -3,16 +3,16 @@ import {Grid} from './Grid'
 
 enum Direction { North, South, East, West}
 
-
 export class PathFinding {
-    private _checked: { [key: string]: boolean } = {}
+    private _checked: { [key: string]: Tile[] } = {}
 
     constructor(public grid: Grid) {
     }
 
     getPath(start: Tile, end: Tile): Tile[] {
-        if (start.id === end.id) return []
-        if (!this.tileInGrid(start) || !this.tileInGrid(end)) return []
+        const startPath: Tile[] = []
+        if (start.id === end.id) return startPath
+        if (!this.tileInGrid(start) || !this.tileInGrid(end)) return startPath
 
         this._checked = {}
 
@@ -25,20 +25,21 @@ export class PathFinding {
         const queue = [start]
         while (queue.length) {
             const current = queue.shift() as Tile
+            this.setAsChecked(start, startPath)
 
             for (const check of checks) {
                 const target = check(current)
                 if (!target) continue
 
-                if (target.id === end.id) return target.path
+                if (target.id === end.id) return this._checked[target.id]
                 if (target.accessible) queue.push(target)
             }
         }
 
-        return []
+        return startPath
     }
 
-    private exploreInDirection(direction: Direction, tile: Tile) {
+    private exploreInDirection(direction: Direction, tile: Tile): Tile | undefined {
         let {rowIndex, colIndex} = tile
         if (direction === Direction.North) {
             rowIndex -= 1
@@ -51,15 +52,17 @@ export class PathFinding {
         }
 
         const targetID = Tile.getIDFromCoordinates(colIndex, rowIndex)
-
         if (this._checked[targetID]) return
-        else this._checked[targetID] = true
 
         const target = this.grid.tiles.find(t => t.id === targetID)
         if (!target || !target.accessible) return
 
-        target.path = [tile, ...tile.path]
+        this.setAsChecked(target, [tile, ...this._checked[tile.id]])
         return target
+    }
+
+    private setAsChecked(tile: Tile, value: Tile[]): void {
+        this._checked[tile.id] = value
     }
 
     private tileInGrid({id}: Tile): boolean {
